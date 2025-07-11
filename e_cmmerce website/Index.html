@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artisan Gallery | Handcrafted Artworks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6B46C1;
+            --secondary: #9F7AEA;
+            --accent: #F687B3;
+            --dark: #1A202C;
+            --light: #F7FAFC;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+
+        .product-card {
+            transition: all 0.3s ease;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px) rotateX(5deg);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .product-image-container {
+            perspective: 1500px;
+        }
+
+        .product-image {
+            transition: transform 1s;
+            transform-style: preserve-3d;
+        }
+
+        .product-image:hover {
+            transform: rotateY(15deg);
+        }
+
+        .review-card {
+            transition: all 0.3s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .checkout-btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            transition: all 0.3s ease;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover::after {
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .product-card {
+                perspective: none;
+                transform-style: flat;
+            }
+            
+            .product-card:hover {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Cart notification */
+        .cart-count {
+            top: -8px;
+            right: -8px;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header/Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="logo.png" alt="Artisan Gallery logo featuring a hand-drawn paintbrush crossing a wooden palette" class="h-12">
+                <h1 class="ml-3 text-xl font-bold text-purple-800">Nabanita's Gallery</h1>
+            </div>
+            
+            <nav class="hidden md:flex space-x-8">
+                <a href="#" class="nav-item text-gray-700 hover:text-purple-600 transition">Home</a>
+                <a href="#products" class="nav-item text-gray-700 hover:text-purple-600 transition">Shop</a>
+                <a href="#about" class="nav-item text-gray-700 hover:text-purple-600 transition">Artists</a>
+                <a href="#reviews" class="nav-item text-gray-700 hover:text-purple-600 transition">Reviews</a>
+                <a href="#contact" class="nav-item text-gray-700 hover:text-purple-600 transition">Contact</a>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <button class="relative" id="cartBtn">
+                    <i class="fas fa-shopping-cart text-xl text-gray-700 hover:text-purple-600 transition"></i>
+                    <span class="cart-count absolute bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden" id="cartCount">0</span>
+                </button>
+                <button class="md:hidden" id="mobileMenuBtn">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div class="md:hidden bg-white shadow-md hidden" id="mobileMenu">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="#" class="py-2 text-gray-700 hover:text-purple-600 transition">Home</a>
+                <a href="#products" class="py-2 text-gray-700 hover:text-purple-600 transition">Shop</a>
+                <a href="#about" class="py-2 text-gray-700 hover:text-purple-600 transition">Artists</a>
+                <a href="#reviews" class="py-2 text-gray-700 hover:text-purple-600 transition">Reviews</a>
+                <a href="#contact" class="py-2 text-gray-700 hover:text-purple-600 transition">Contact</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-to-r from-purple-500 to-pink-500 text-white py-20">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-10 md:mb-0">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Handcrafted Artistry Meets Modern Elegance</h2>
+                <p class="text-lg mb-6">Discover unique sketches, drawings, and wood art pieces crafted by talented artisans worldwide.</p>
+                <a href="#products" class="inline-block bg-white text-purple-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition duration-300 transform hover:scale-105">Explore Collections</a>
+            </div>
+            <div class="md:w-1/2 relative">
+                <div class="product-image-container">
+                    <img src="takeout-1-001/Screenshot_20250711_020413_Instagram.jpg" alt="High-quality wooden sculpture featuring intricate details of forest animals playing together in a harmonious scene" class="product-image rounded-lg shadow-2xl w-full">
+                </div>
+                <div class="absolute -bottom-10 -right-10 bg-white p-4 rounded-lg shadow-lg hidden md:block">
+                    <span class="block text-purple-700 font-bold text-xl">Featured Artist</span>
+                    <span class="block text-gray-600">Nabanita Kundu</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Categories -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Our Art Collections</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl product-card">
+                    <div class="product-image-container h-64 relative">
+                        <img src="takeout-1-001/Screenshot_20250711_021659_Instagram.jpg" alt="Collection of artistic sketches in various styles from charcoal portraits to ink landscapes" class="product-image w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
+                            <h3 class="text-white text-xl font-bold">Fine Sketches</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">Experience the raw beauty of pencil and charcoal masterpieces.</p>
+                        <a href="#" class="text-purple-600 font-medium hover:text-purple-800 transition">View Collection →</a>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl product-card">
+                    <div class="product-image-container h-64 relative">
+                        <img src="takeout-1-001/Screenshot_20250711_021621_Instagram.jpg" alt="Vibrant watercolor paintings featuring landscapes and abstract designs with bright color palettes" class="product-image w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
+                            <h3 class="text-white text-xl font-bold">Paintings</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">From watercolors to acrylics, discover stunning visual narratives.</p>
+                        <a href="#" class="text-purple-600 font-medium hover:text-purple-800 transition">View Collection →</a>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl product-card">
+                    <div class="product-image-container h-64 relative">
+                        <img src="takeout-1-001/Screenshot_20250711_021004_Instagram.jpg" alt="Various wooden crafts including carved bowls, decorative wall pieces, and sculptural objects showing natural wood grain" class="product-image w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
+                            <h3 class="text-white text-xl font-bold">Wood Crafts</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4">Functional and decorative pieces celebrating natural wood textures.</p>
+                        <a href="#" class="text-purple-600 font-medium hover:text-purple-800 transition">View Collection →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Featured Artworks</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="productsGrid">
+                <!-- Products will be dynamically inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Artists -->
+    <section id="about" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Meet Our Artists</h2>
+            
+            <div class="flex flex-col md:flex-row items-center mb-12">
+                <div class="md:w-1/3 mb-8 md:mb-0">
+                    <img src="takeout-1-001/IMG-20250210-WA0010.jpg" alt="Portrait of artist Marcus Chen with his signature circular glasses in his studio surrounded by half-finished wooden sculptures" class="rounded-lg shadow-lg w-full">
+                </div>
+                <div class="md:w-2/3 md:pl-12">
+                    <h3 class="text-2xl font-bold mb-4">Nabanita Kundu</h3>
+                    <p class="text-gray-700 mb-4">Artist | Since 2015</p>
+                    <p class="text-gray-600 mb-6">Nabanita transforms reclaimed wood into functional artworks that tell stories. Each piece preserves the material's history while serving contemporary needs.</p>
+                    <div class="flex space-x-4 mb-6">
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Custom Commissions</span>
+                        <span class="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm">Sustainable Materials</span>
+                    </div>
+                    <a href="#" class="inline-block border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-600 hover:text-white transition">View Collection</a>
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center mb-12">
+                <div class="md:w-1/3 order-last md:order-first mb-8 md:mb-0">
+                    <img src="takeout-1-001/WhatsApp Image 2025-07-10 at 2.46.22 PM.jpeg" alt="Artist Sophia Williams at her drafting table with multiple sketchbooks and pencils showing her detailed architectural drawings" class="rounded-lg shadow-lg w-full">
+                </div>
+                <div class="md:w-2/3 md:pr-12">
+                    <h3 class="text-2xl font-bold mb-4">Sophia Williams</h3>
+                    <p class="text-gray-700 mb-4">Architectural Illustrator | Since 2010</p>
+                    <p class="text-gray-600 mb-6">Sophia's precise line work captures the essence of buildings and urban landscapes with a romantic perspective that blends technical accuracy with artistic flair.</p>
+                    <div class="flex space-x-4 mb-6">
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Limited Editions</span>
+                        <span class="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm">International Exhibits</span>
+                    </div>
+                    <a href="#" class="inline-block border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-600 hover:text-white transition">View Collection</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Customer Reviews -->
+    <section id="reviews" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">What Our Customers Say</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-6 rounded-lg review-card">
+                    <div class="flex items-center mb-4">
+                        <div class="flex space-x-1 text-yellow-400">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-4">"The wooden bowl I purchased is absolutely stunning—you can tell it was made with love and attention to detail. It's become the centerpiece of my dining table!"</p>
+                    <div class="flex items-center">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/60843864-9c34-404e-a9d2-138d544e5f85.png" alt="Portrait of reviewer Emily Johnson a 30-something woman with curly hair smiling at the camera" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <p class="font-medium">Emily Johnson</p>
+                            <p class="text-sm text-gray-500">Verified Buyer</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-lg review-card">
+                    <div class="flex items-center mb-4">
+                        <div class="flex space-x-1 text-yellow-400">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-4">"Sophia's architectural drawings exceeded my expectations. The framing and presentation were museum-quality. Will definitely be ordering more for my office."</p>
+                    <div class="flex items-center">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/388a66b2-e1c3-4aa0-a63b-5b2990fe3412.png" alt="Portrait of reviewer Jamal Carter a professional looking man in his 40s wearing glasses" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <p class="font-medium">Jamal Carter</p>
+                            <p class="text-sm text-gray-500">Verified Buyer</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-lg review-card">
+                    <div class="flex items-center mb-4">
+                        <div class="flex space-x-1 text-yellow-400">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-4">"The packaging was eco-friendly and the artwork arrived in perfect condition. Customer service responded within minutes when I had a question about mounting options."</p>
+                    <div class="flex items-center">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/3fc74116-5950-4cce-8ffb-a03289389d9c.png" alt="Portrait of reviewer Anita Patel a woman in her late 20s with long dark hair wearing traditional jewelry" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <p class="font-medium">Anita Patel</p>
+                            <p class="text-sm text-gray-500">Verified Buyer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <button class="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 transition">Leave a Review</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="py-16 bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Stay Inspired</h2>
+            <p class="text-lg mb-8 max-w-2xl mx-auto">Subscribe to receive updates on new artists, limited editions, and exclusive offers.</p>
+            
+            <div class="flex flex-col sm:flex-row justify-center max-w-xl mx-auto">
+                <input type="email" placeholder="Your email address" class="px-4 py-3 rounded-lg mb-2 sm:mb-0 sm:mr-2 w-full sm:w-auto focus:outline-none">
+                <button class="bg-white text-purple-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition">Subscribe</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Get In Touch</h2>
+            
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <div class="bg-gray-50 p-8 rounded-lg h-full">
+                        <h3 class="text-xl font-bold mb-4">Contact Information</h3>
+                        <p class="text-gray-600 mb-6">Have questions about commissioning artwork or need assistance with an order? We're here to help.</p>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <i class="fas fa-map-marker-alt text-purple-600 mt-1 mr-4"></i>
+                                <div>
+                                    <h4 class="font-medium">Studio Address</h4>
+                                    <p class="text-gray-600">123 Artisan Lane, Creative District<br>Portland, OR 97209</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <i class="fas fa-envelope text-purple-600 mt-1 mr-4"></i>
+                                <div>
+                                    <h4 class="font-medium">Email Us</h4>
+                                    <p class="text-gray-600">hello@artisangallery.com</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <i class="fas fa-phone-alt text-purple-600 mt-1 mr-4"></i>
+                                <div>
+                                    <h4 class="font-medium">Call Us</h4>
+                                    <p class="text-gray-600">(503) 555-1212</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:w-1/2 md:pl-8">
+                    <form class="bg-gray-50 p-8 rounded-lg">
+                        <div class="mb-4">
+                            <label for="name" class="block text-gray-700 mb-2">Name</label>
+                            <input type="text" id="name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="email" class="block text-gray-700 mb-2">Email</label>
+                            <input type="email" id="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="subject" class="block text-gray-700 mb-2">Subject</label>
+                            <select id="subject" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
+                                <option value="">Select a subject</option>
+                                <option value="order">Order Inquiry</option>
+                                <option value="artist">Artist Collaboration</option>
+                                <option value="custom">Custom Commission</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="message" class="block text-gray-700 mb-2">Message</label>
+                            <textarea id="message" rows="5" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 transition w-full">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/0903e5a6-505e-47e8-a2cf-cb54befbc14d.png" alt="Artisan Gallery logo featuring a hand-drawn paintbrush crossing a wooden palette" class="h-12 mb-4">
+                    <p class="text-gray-400 mb-4">Celebrating the craftsmanship and dedication of independent artists worldwide.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-pinterest-p"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Shop</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">All Products</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Sketches</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Paintings</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Wood Crafts</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Sale Items</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Help</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Shipping & Returns</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Care Instructions</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">FAQ</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Contact</h3>
+                    <ul class="space-y-2">
+                        <li class="text-gray-400">123 Artisan Lane<br>Portland, OR 97209</li>
+                        <li class="text-gray-400">(503) 555-1212</li>
+                        <li class="text-gray-400">hello@artisangallery.com</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500">
+                <p>© 2023 Artisan Gallery. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Shopping Cart Modal -->
+    <div class="fixed inset-0 bg-black/50 z-50 hidden" id="cartModal">
+        <div class="absolute right-0 top-0 bottom-0 bg-white w-full max-w-md overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xl font-bold">Your Shopping Cart</h3>
+                    <button id="closeCartBtn">
+                        <i class="fas fa-times text-2xl text-gray-500 hover:text-red-500 transition"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-6" id="cartItems">
+                    <!-- Cart items will be dynamically inserted here -->
+                    <div class="text-center py-12" id="emptyCartMessage">
+                        <div class="text-gray-400 mb-4">
+                            <i class="fas fa-shopping-cart text-4xl"></i>
+                        </div>
+                        <p class="text-gray-500 mb-4">Your cart is empty</p>
+                        <a href="#products" class="text-purple-600 font-medium">Start Shopping</a>
+                    </div>
+                </div>
+                
+                <div class="mt-8 pt-8 border-t border-gray-200 hidden" id="cartSummary">
+                    <div class="flex justify-between mb-4">
+                        <span class="text-gray-600">Subtotal</span>
+                        <span class="font-medium" id="cartSubtotal">$0.00</span>
+                    </div>
+                    <div class="flex justify-between mb-4">
+                        <span class="text-gray-600">Shipping</span>
+                        <span class="font-medium">Calculated at checkout</span>
+                    </div>
+                    <div class="flex justify-between mb-6 text-lg">
+                        <span>Total</span>
+                        <span class="font-bold" id="cartTotal">$0.00</span>
+                    </div>
+                    <button class="checkout-btn text-white px-6 py-3 rounded-lg font-medium w-full">
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Checkout Modal -->
+    <div class="fixed inset-0 bg-black/50 z-50 hidden" id="checkoutModal">
+        <div class="absolute right-0 top-0 bottom-0 bg-white w-full max-w-md overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xl font-bold">Checkout</h3>
+                    <button id="closeCheckoutBtn">
+                        <i class="fas fa-times text-2xl text-gray-500 hover:text-red-500 transition"></i>
+                    </button>
+                </div>
+                
+                <form id="checkoutForm">
+                    <div class="mb-8">
+                        <h4 class="font-bold mb-4">Contact Information</h4>
+                        <div class="mb-4">
+                            <input type="email" placeholder="Email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h4 class="font-bold mb-4">Shipping Address</h4>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <input type="text" placeholder="First Name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" required>
+                            </div>
+                            <div>
+                                <input type="text" placeholder="Last Name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" placeholder="Address" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" placeholder="Apartment, suite, etc. (optional)" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <input type="text" placeholder="City" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" required>
+                            </div>
+                            <div>
+                                <select class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" required>
+                                    <option value="">Country</option>
+                                    <option value="US">United States</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="UK">United Kingdom</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <select class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" required>
+                                    <option value="">State</option>
+                                    <option value="CA">California</option>
+                                    <option value="OR">Oregon</option>
+                                    <option value="WA">Washington</option>
+                                </select>
+                            </div>
+                            <div>
+                                <input type="text" placeholder="ZIP Code" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h4 class="font-bold mb-4">Payment Method</h4>
+                        <div class="border rounded-lg overflow-hidden mb-4">
+                            <div class="flex items-center p-4 border-b">
+                                <input type="radio" id="credit-card" name="payment" class="mr-3" checked>
+                                <label for="credit-card" class="flex-grow">Credit Card</label>
+                                <div class="flex space-x-2">
+                                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/15fb16ee-f13c-4780-b000-00f5d656c5fe.png" alt="Visa credit card logo" class="h-6">
+                                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/425eac2f-a64f-4965-99d6-ec7ed8986a8a.png" alt="Mastercard logo" class="h-6">
+                                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/8d0d66d2-63a4-4126-b005-01f7a7b82211.png" alt="American Express logo" class="h-6">
+                                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/42433050-a779-4450-b8d3-f589824a2409.png" alt="Discover card logo" class="h-6">
+                                </div>
+                            </div>
+                            <div id="creditCardFields" class="p-4">
+                                <div class="mb-4">
+                                    <input type="text" placeholder="Card Number" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" required>
+                                </div>
+                                <div class="mb-4">
+                                    <input type="text" placeholder="Name on Card" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" required>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <input type="text" placeholder="Expiration (MM/YY)" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" required>
+                                    </div>
+                                    <div>
+                                        <input type="text" placeholder="CVV" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border rounded-lg overflow-hidden">
+                            <div class="flex items-center p-4">
+                                <input type="radio" id="paypal" name="payment" class="mr-3">
+                                <label for="paypal" class="flex-grow">PayPal</label>
+                                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/373b8a11-9756-4aa4-8686-3ea096fbdc8e.png" alt="PayPal payment method logo" class="h-6">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-6 mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span>Subtotal</span>
+                            <span>$120.00</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span>Shipping</span>
+                            <span>$12.00</span>
+                        </div>
+                        <div class="flex justify-between mb-4 font-bold text-lg">
+                            <span>Total</span>
+                            <span>$132.00</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="checkout-btn text-white px-6 py-3 rounded-lg font-medium w-full">
+                        Complete Order
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Confirmation Modal -->
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden" id="orderConfirmationModal">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-8 text-center">
+            <div class="text-green-500 mb-4">
+                <i class="fas fa-check-circle text-5xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2">Order Confirmed!</h3>
+            <p class="text-gray-600 mb-6">Thank you for your purchase. Your order #54291 has been placed successfully.</p>
+            <div class="mb-6">
+                <p class="mb-2">A confirmation email has been sent to:</p>
+                <p class="font-medium">customer@example.com</p>
+            </div>
+            <button id="continueShoppingBtn" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 transition w-full">
+                Continue Shopping
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Product database
+        const products = [
+            {
+                id: 1,
+                name: "Prabhu Ganesh ji",
+                description: "Painting of Lord Ganseh",
+                price: 320.00,
+                image: "takeout-1-001/Screenshot_20250711_015959_Instagram.jpg",
+                alt: "Vibrant blue watercolor painting showing crashing ocean waves with dramatic light reflections",
+                category: "painting",
+                artist: "Nabanita Kundu",
+                dimensions: "24\" × 18\"",
+                materials: "Watercolor on 300gsm cotton paper",
+                rating: 5,
+                reviews: 15
+            },
+             {
+                id: 22,
+                name: "Mahadev",
+                description: "Mata Parvati and Mahadev ",
+                price: 245.00,
+                image: "takeout-1-001/IMG-20250331-WA0040.jpg",
+                alt: "",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "12\" × 8\" × 6\"",
+                materials: "Sustainable maple wood, beeswax finish",
+                rating: 5,
+                reviews: 28
+            },
+         
+            {
+                id: 6,
+                name: "Shree Ganesh",
+                description: "Shree Ganesh ji and Mata Parvati ji",
+                price: 290.00,
+                image: "takeout-1-001/Screenshot_20250711_021152_Instagram.jpg",
+                alt: "Modern geometric wooden wall art with intricate inlaid patterns using different wood species",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "24\" × 24\"",
+                materials: "Walnut, maple, and oak",
+                rating: 5,
+                reviews: 19
+            },
+            {
+                id: 7,
+                name: "Mata Parvati And Shiv ji",
+                description: "Painting of dunion of Mata Parvati and shiv ji",
+                price: 275.00,
+                image: "takeout-1-001/Screenshot_20250711_021207_Instagram.jpg",
+                alt: "Collection of five botanical watercolor paintings featuring different flowers with scientific accuracy",
+                category: "painting",
+                artist: "Nabanita Kundu",
+                dimensions: "Each 8\" × 10\"",
+                materials: "Watercolor on cold-pressed paper",
+                rating: 4.7,
+                reviews: 31
+            },
+
+               {
+                id: 2,
+                name: "Radha Krishn",
+                description: "Painting of Radha krishn",
+                price: 320.00,
+                image: "takeout-1-001/Screenshot_20250711_020923_Instagram.jpg",
+                alt: "Vibrant blue watercolor painting showing crashing ocean waves with dramatic light reflections",
+                category: "painting",
+                artist: "Nabanita Kundu",
+                dimensions: "24\" × 18\"",
+                materials: "Watercolor on 300gsm cotton paper",
+                rating: 5,
+                reviews: 15
+            },
+            {
+                id: 4,
+                name: "shree Krishn",
+                description: "Painting of Kishori ji and shree krishn ji",
+                price: 165.00,
+                image: "takeout-1-001/Screenshot_20250711_021033_Instagram.jpg",
+                alt: "Beautiful wooden bowl with natural bark edges showing elegant wood grain patterns",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "10\" diameter × 4\" deep",
+                materials: "Reclaimed birch, food-safe finish",
+                rating: 4,
+                reviews: 36
+            },
+            {
+                id: 5,
+                name: "RadhaKrishn",
+                description: "Collection of 3 charcoal portrait studies",
+                price: 210.00,
+                image: "takeout-1-001/Screenshot_20250711_021139_Instagram.jpg",
+                alt: "Three framed charcoal portrait sketches showing different emotional expressions",
+                category: "sketch",
+                artist: "Nabanita Kundu",
+                dimensions: "Each 11\" × 14\"",
+                materials: "Vine charcoal on toned paper",
+                rating: 4.8,
+                reviews: 24
+            },
+            
+            {
+                id: 8,
+                name: "Sita Ram",
+                description: "Mata Sita and Ram ji during vanvash",
+                price: 195.00,
+                image: "takeout-1-001/Screenshot_20250711_021236_Instagram.jpg",
+                alt: "Leather-bound sketchbook showing quick urban sketches of cafes, streets, and architecture",
+                category: "sketch",
+                artist: "Nabanita Kundu",
+                dimensions: "9\" × 12\"",
+                materials: "Ink and wash, archival paper",
+                rating: 4.9,
+                reviews: 27
+            },
+            {
+                id: 9,
+                name: "old man",
+                description: "Painting of old Person",
+                price: 195.00,
+                image: "takeout-1-001/Screenshot_20250711_021539_Instagram.jpg",
+                alt: "Leather-bound sketchbook showing quick urban sketches of cafes, streets, and architecture",
+                category: "sketch",
+                artist: "Nabanita Kundu",
+                dimensions: "9\" × 12\"",
+                materials: "Ink and wash, archival paper",
+                rating: 4.9,
+                reviews: 27
+            },
+              {
+                id: 10,
+                name: "Koi Fish Paintings",
+                description: "A series of vibrant Koi Fish in aquatic settings with lotus flowers",
+                price: 245.00,
+                image: "takeout-1-001/Screenshot_20250711_015523_Instagram.jpg",
+                alt: "",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "12\" × 8\" × 6\"",
+                materials: "Sustainable maple wood, beeswax finish",
+                rating: 5,
+                reviews: 28
+            },
+            {
+                id: 11,
+                name: "Koi Fish Paintings",
+                description: "A series of vibrant Koi Fish in aquatic settings with lotus flowers",
+                price: 245.00,
+                image: "takeout-1-001/Screenshot_20250711_020334_Instagram.jpg",
+                alt: "",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "12\" × 8\" × 6\"",
+                materials: "Sustainable maple wood, beeswax finish",
+                rating: 5,
+                reviews: 28
+            },
+            {
+                id: 12,
+                name: "Koi Fish Paintings",
+                description: "A series of vibrant Koi Fish in aquatic settings with lotus flowers",
+                price: 245.00,
+                image: "takeout-1-001/Screenshot_20250711_020738_Instagram.jpg",
+                alt: "",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "12\" × 8\" × 6\"",
+                materials: "Sustainable maple wood, beeswax finish",
+                rating: 5,
+                reviews: 28
+            },
+             {
+                id: 13,
+                name: "Card for Childrens",
+                description: "A series of charater on deck of cards",
+                price: 245.00,
+                image: "takeout-1-001/Screenshot_20250711_020431_Instagram.jpg",
+                alt: "",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "12\" × 8\" × 6\"",
+                materials: "Sustainable maple wood, beeswax finish",
+                rating: 5,
+                reviews: 28
+            },
+             {
+                id: 14,
+                name: "Happy Birthday Card",
+                description: "hand made Happy Birthday wishing card",
+                price: 245.00,
+                image: "takeout-1-001/Screenshot_20250711_020533_Instagram.jpg",
+                alt: "",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "12\" × 8\" × 6\"",
+                materials: "Sustainable maple wood, beeswax finish",
+                rating: 5,
+                reviews: 28
+            },
+            {
+                id: 15,
+                name: "Motivation Card",
+                description: "Motivating card",
+                price: 245.00,
+                image: "takeout-1-001/Screenshot_20250711_020632_Instagram.jpg",
+                alt: "",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "12\" × 8\" × 6\"",
+                materials: "Sustainable maple wood, beeswax finish",
+                rating: 5,
+                reviews: 28
+            },{
+                id: 16,
+                name: "Motivation Card",
+                description: "Motivating card",
+                price: 245.00,
+                image: "takeout-1-001/Screenshot_20250711_020357_Instagram.jpg",
+                alt: "",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "12\" × 8\" × 6\"",
+                materials: "Sustainable maple wood, beeswax finish",
+                rating: 5,
+                reviews: 28
+            },
+             
+            {
+                id: 17,
+                name: "Character Artwork",
+                description: "Featuring beloved animated Characters such as Jerry from Tom and Jerry",
+                price: 180.00,
+                image: "takeout-1-001/Screenshot_20250711_020614_Instagram.jpg",
+                alt: "Nostalgic Illustrations",
+                category: "sketch",
+                artist: "Nabanita Kundu",
+                dimensions: "18\" × 12\"",
+                materials: "Handerchieif",
+                rating: 4.5,
+                reviews: 42
+            },
+            {
+                id: 18,
+                name: "Sun & Moon",
+                description: "Hot and Cold",
+                price: 245.00,
+                image: "takeout-1-001/Screenshot_20250711_020647_Instagram.jpg",
+                alt: "",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "12\" × 8\" × 6\"",
+                materials: "Sustainable maple wood, beeswax finish",
+                rating: 5,
+                reviews: 28
+            },
+            {
+                id: 19,
+                name: "Lotus",
+                description: "Drawing of Lotus",
+                price: 245.00,
+                image: "takeout-1-001/Screenshot_20250711_020809_Instagram.jpg",
+                alt: "",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "12\" × 8\" × 6\"",
+                materials: "Sustainable maple wood, beeswax finish",
+                rating: 5,
+                reviews: 28
+            },
+            {
+                id: 20,
+                name: "Math emoji",
+                description: "Maths keeda",
+                price: 245.00,
+                image: "takeout-1-001/Screenshot_20250711_020823_Instagram.jpg",
+                alt: "",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "12\" × 8\" × 6\"",
+                materials: "Sustainable maple wood, beeswax finish",
+                rating: 5,
+                reviews: 28
+            },
+            {
+                id: 21,
+                name: "Peacock",
+                description: "Painting of Peacock ",
+                price: 245.00,
+                image: "takeout-1-001/Screenshot_20250711_020437_Instagram.jpg",
+                alt: "",
+                category: "wood",
+                artist: "Nabanita Kundu",
+                dimensions: "12\" × 8\" × 6\"",
+                materials: "Sustainable maple wood, beeswax finish",
+                rating: 5,
+                reviews: 28
+            },
+        ];
+
+        // Cart state
+        let cart = [];
+        
+        // DOM Elements
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const cartBtn = document.getElementById('cartBtn');
+        const cartModal = document.getElementById('cartModal');
+        const closeCartBtn = document.getElementById('closeCartBtn');
+        const cartItems = document.getElementById('cartItems');
+        const emptyCartMessage = document.getElementById('emptyCartMessage');
+        const cartSummary = document.getElementById('cartSummary');
+        const cartSubtotal = document.getElementById('cartSubtotal');
+        const cartTotal = document.getElementById('cartTotal');
+        const cartCount = document.getElementById('cartCount');
+        const productsGrid = document.getElementById('productsGrid');
+        const checkoutModal = document.getElementById('checkoutModal');
+        const closeCheckoutBtn = document.getElementById('closeCheckoutBtn');
+        const checkoutForm = document.getElementById('checkoutForm');
+        const orderConfirmationModal = document.getElementById('orderConfirmationModal');
+        const continueShoppingBtn = document.getElementById('continueShoppingBtn');
+
+        // Mobile Menu Toggle
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Cart Modal Toggle
+        cartBtn.addEventListener('click', () => {
+            cartModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        });
+
+        closeCartBtn.addEventListener('click', () => {
+            cartModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Checkout Modal Toggle
+        function openCheckoutModal() {
+            checkoutModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        closeCheckoutBtn.addEventListener('click', () => {
+            checkoutModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        });
+
+        continueShoppingBtn.addEventListener('click', () => {
+            orderConfirmationModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Render Products
+        function renderProducts() {
+            productsGrid.innerHTML = '';
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl product-card';
+                productCard.innerHTML = `
+                    <div class="product-image-container h-64 relative">
+                        <img src="${product.image}" alt="${product.alt}" class="product-image w-full h-full object-cover">
+                        ${product.rating ? `
+                            <div class="absolute top-4 left-4 bg-white/80 px-2 py-1 rounded-full flex items-center">
+                                <span class="text-yellow-500 mr-1">${product.rating}</span>
+                                <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                <span class="text-gray-600 text-xs ml-1">(${product.reviews})</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-bold mb-1">${product.name}</h3>
+                                <p class="text-gray-600 text-sm mb-3">by ${product.artist}</p>
+                            </div>
+                            <span class="text-purple-700 font-bold">$${product.price.toFixed(2)}</span>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-4">${product.description}</p>
+                        <button class="add-to-cart w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition" data-id="${product.id}">
+                            Add to Cart
+                        </button>
+                    </div>
+                `;
+                
+                productsGrid.appendChild(productCard);
+            });
+        }
+
+        // Add to Cart
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            
+            // Check if product already in cart
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    alt: product.alt,
+                    quantity: 1
+                });
+            }
+            
+            updateCart();
+            
+            // Show cart count animation
+            cartCount.classList.remove('hidden');
+            cartCount.classList.add('animate-bounce');
+            setTimeout(() => {
+                cartCount.classList.remove('animate-bounce');
+            }, 1000);
+        }
+
+        // Update Cart UI
+        function updateCart() {
+            // Update cart count
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            
+            if (totalItems === 0) {
+                cartCount.classList.add('hidden');
+            } else {
+                cartCount.classList.remove('hidden');
+            }
+            
+            // Render cart items
+            cartItems.innerHTML = '';
+            
+            if (cart.length === 0) {
+                emptyCartMessage.classList.remove('hidden');
+                cartSummary.classList.add('hidden');
+                return;
+            }
+            
+            emptyCartMessage.classList.add('hidden');
+            
+            cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'flex border-b border-gray-200 pb-4';
+                cartItem.innerHTML = `
+                    <div class="w-20 h-20 rounded-lg overflow-hidden mr-4">
+                        <img src="${item.image}" alt="${item.alt}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between">
+                            <h4 class="font-medium mb-1">${item.name}</h4>
+                            <span class="font-bold">$${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <div class="flex items-center border rounded-lg">
+                                <button class="decrease-quantity px-2 text-gray-500" data-id="${item.id}">
+                                    <i class="fas fa-minus text-xs"></i>
+                                </button>
+                                <span class="px-2">${item.quantity}</span>
+                                <button class="increase-quantity px-2 text-gray-500" data-id="${item.id}">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                            <button class="remove-item text-red-500 text-sm" data-id="${item.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                cartItems.appendChild(cartItem);
+            });
+            
+            // Add event listeners to quantity buttons
+            document.querySelectorAll('.increase-quantity').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                    const item = cart.find(item => item.id === id);
+                    item.quantity += 1;
+                    updateCart();
+                });
+            });
+            
+            document.querySelectorAll('.decrease-quantity').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                    const item = cart.find(item => item.id === id);
+                    
+                    if (item.quantity > 1) {
+                        item.quantity -= 1;
+                    } else {
+                        cart = cart.filter(item => item.id !== id);
+                    }
+                    
+                    updateCart();
+                });
+            });
+            
+            document.querySelectorAll('.remove-item').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                    cart = cart.filter(item => item.id !== id);
+                    updateCart();
+                });
+            });
+            
+            // Update cart summary
+            const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+            cartTotal.textContent = `$${subtotal.toFixed(2)}`;
+            
+            cartSummary.classList.remove('hidden');
+            
+            // Add event listener to checkout button
+            const checkoutBtn = document.querySelector('#cartSummary button');
+            checkoutBtn.addEventListener('click', () => {
+                cartModal.classList.add('hidden');
+                openCheckoutModal();
+            });
+        }
+
+        // Handle Checkout Form Submission
+        checkoutForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // In a real app, you would process payment here
+            // For this demo, we'll just show the confirmation
+            
+            setTimeout(() => {
+                checkoutModal.classList.add('hidden');
+                orderConfirmationModal.classList.remove('hidden');
+                
+                // Clear cart
+                cart = [];
+                updateCart();
+            }, 1500);
+        });
+
+        // Event Delegation for Add to Cart
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.add-to-cart')) {
+                const productId = parseInt(e.target.closest('.add-to-cart').getAttribute('data-id'));
+                addToCart(productId);
+            }
+        });
+
+        // Initialize
+        renderProducts();
+    </script>
+</body>
+</html>
+
